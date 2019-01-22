@@ -42,7 +42,7 @@
       </ui-col>
     </ui-row>
 
-    <ui-popup show="{{ popupShow }}" height="270" background="transparent">
+    <ui-popup show="{{ popupShow }}" background="transparent">
       <view class="popupView">
           <ui-row height="40" border-bottom>
               <ui-col vertical-align="middle" space-left="20">{{ goodsDetail.basicInfo.name }}</ui-col>
@@ -70,7 +70,7 @@
     </ui-popup>
 
 
-    <ui-popup show="{{ popupShowCar }}" height="270" background="transparent">
+    <ui-popup show="{{ popupShowCar }}" background="transparent">
       <view class="popupView">
           <ui-row height="40" border-bottom>
               <ui-col vertical-align="middle" space-left="20">购物车</ui-col>
@@ -106,7 +106,7 @@
       </view>
     </ui-popup>
 
-    <ui-popup show="{{ popupShowLogin }}" height="270" background="transparent">
+    <ui-popup show="{{ popupShowLogin }}" background="transparent">
       <view class="popupView" style="text-align:center;">
           <ui-row height="40" border-bottom>
               <ui-col vertical-align="middle" space-left="20"></ui-col>
@@ -191,6 +191,8 @@ export default {
         res.data.forEach(element => {
           _tabContentData.push(element)
         });
+        console.log(_tabContentData);
+        
         _this.setData({
           tabContentData: _tabContentData
         })
@@ -249,7 +251,8 @@ export default {
     let categoryId = ''
     if (index > 0) {
       categoryId = _this.data.tabItems[index].id
-    }    
+    }
+    console.log('categoryId:', categoryId)
     _this.fetchGoodsList(categoryId)
   },
   closePop: function () {
