@@ -12,7 +12,8 @@
 
 ## 开发框架
 
-基于[Touch WX](http://www.wetouch.net/touchwx_doc/quickstart/)框架，可以点击查看
+
+基于[Touch WX](http://www.wetouch.net/touchwx_doc/quickstart/)框架，可以点击查看
 
 [开发环境安装](http://www.wetouch.net/touchwx_doc/quickstart/begin/ide)
 
