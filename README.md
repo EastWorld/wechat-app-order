@@ -24,7 +24,7 @@
 <img src="screenshot/6.png" width="400px"/>
 <img src="screenshot/7.png" width="400px"/>
 
-## 使用教程
+## 使用教程
 1. 修改 config.js 文件， subDomain 改为你自己的域名
     > 你可以 [免费开通后台账号](https://www.it120.cc/)
 2. 登录你的[小程序后台](https://mp.weixin.qq.com)，[设置小程序合法服务器域名](https://www.it120.cc/info/faq/10469)，修改后需要重启小程序开发工具才能生效
