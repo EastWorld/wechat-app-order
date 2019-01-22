@@ -1,0 +1,609 @@
+<template>
+  <view>
+    <ui-row>
+      <ui-col span="3">
+        <ui-v-tabs 
+          height="{{height}}"
+          tab-style="{{tabStyle}}"
+          active-tab-style="{{activeTabStyle}}"
+          class="tab-item"
+          index="{{ current }}"
+          data-key = "current"
+          bindchange="categoryChange">
+          <ui-v-tab wx:for="{{ tabItems }}" wx:key="id">
+            {{ item.name }}
+          </ui-v-tab>
+        </ui-v-tabs>
+      </ui-col>
+      <ui-col>
+        <scroll-view scroll-y style="{{ {height:height+'px'} }}">
+          <view class="goods-box">
+            <view class="goods-list" wx:for="{{tabContentData}}" wx:for-index="idx" wx:key="id" bindtap="fetchGoodsDetail" data-id="{{item.id}}">
+                <image class="imgbox" src="{{item.pic}}"></image>
+                <view class="small-title">{{item.name}}</view>
+                <view wx:if="{{item.minPrice}}" class="goodsPrice">￥ {{item.minPrice}}</view>
+            </view>
+          </view>
+        </scroll-view>
+      </ui-col>
+    </ui-row>
+    <ui-row space="10" class="bottomDom">
+      <ui-col span="8" space="5">
+          <view class="gouwuche" bindtap="toggleCar">
+            <image class="gouwucheImg" src="../../static/images/car.png"></image>
+            <ui-badge text="{{goodsCarList.length}}"></ui-badge>
+            <text class="gouwucheMoney">￥ {{totleOrderMoney}}</text>
+          </view>
+      </ui-col>
+      <ui-col span="4" space="5">
+          <view>
+            <button type="warn" loading="{{creating}}" bindtap="createOrder" disabled="{{!canCreateOrder}}">下单</button>
+          </view>
+      </ui-col>
+    </ui-row>
+
+    <ui-popup show="{{ popupShow }}" height="270" background="transparent">
+      <view class="popupView">
+          <ui-row height="40" border-bottom>
+              <ui-col vertical-align="middle" space-left="20">{{ goodsDetail.basicInfo.name }}</ui-col>
+              <ui-col width="40" vertical-align="middle" align="center" bindtap="closePop">
+                  <ui-icon type="x" size="18" color="#FC8950"></ui-icon>
+              </ui-col>
+          </ui-row>
+          <block wx:for="{{goodsDetail.properties}}" wx:key="id">
+            <view class="popTitle">{{item.name}}</view>
+            <ui-tags 
+              data="{{item.childsCurGoods}}" 
+              fixed-width
+              data-pindex="{{index}}"
+              bindchange="selectedProperty" ></ui-tags>
+          </block>
+          <ui-row height="50">
+              <ui-col space-left="20" space-right="10" vertical-align="middle">
+                <text style="color:#972323">￥ {{goodsPrice}}</text>
+              </ui-col>
+              <ui-col space-left="10" space-right="20" vertical-align="middle">
+                <button type="primary" bindtap="addGoodsCar" disabled="{{ !canbuy }}">加入购物车</button>
+              </ui-col>
+          </ui-row>
+      </view>
+    </ui-popup>
+
+
+    <ui-popup show="{{ popupShowCar }}" height="270" background="transparent">
+      <view class="popupView">
+          <ui-row height="40" border-bottom>
+              <ui-col vertical-align="middle" space-left="20">购物车</ui-col>
+              <ui-col width="40" vertical-align="middle" align="center" bindtap="toggleCar">
+                  <ui-icon type="x" size="18" color="#FC8950"></ui-icon>
+              </ui-col>
+          </ui-row>
+          <image class="empty-car-img" wx:if="{{goodsCarList.length == 0}}" src="https://cdn.it120.cc/apifactory/2019/01/15/efe19e3b852c0912e4b834f426363f29.png"></image>
+          <view wx:if="{{goodsCarList.length == 0}}" class="empty-car">您的购物车是空的~</view>
+          <ui-row wx:for="{{goodsCarList}}" wx:key="goodsId" height="80" border-bottom hover-class="touchui-hover">
+            <ui-col width="80" align="center" vertical-align="middle">
+                <view class="left_icon left_icon1">
+                  <image class="imgbox" src="{{item.pic}}"></image>
+                </view>
+            </ui-col>
+            <ui-col class="text" align="left" vertical-align="middle" space="20">
+              <view style="width: 100%;">
+                <view>
+                  <text>{{item.goodsName}}</text>
+                  <text>{{item.propertyChildNames}}</text>
+                </view>
+                <ui-row height="30">
+                    <ui-col align="left" vertical-align="middle">
+                      <ui-stepper data-index="{{index}}" value="{{item.number}}" bindsubtraction="changegoodscarnumber" bindaddition="changegoodscarnumber"></ui-stepper>
+                    </ui-col>
+                    <ui-col align="right" width="100" vertical-align="middle" space-right="10">
+                      <text style="color:red;">￥ {{item.priceSingle}}</text>
+                    </ui-col>
+                </ui-row>
+              </view>
+            </ui-col>
+          </ui-row>
+      </view>
+    </ui-popup>
+
+    <ui-popup show="{{ popupShowLogin }}" height="270" background="transparent">
+      <view class="popupView" style="text-align:center;">
+          <ui-row height="40" border-bottom>
+              <ui-col vertical-align="middle" space-left="20"></ui-col>
+              <ui-col width="40" vertical-align="middle" align="center" bindtap="closePopLogin">
+                  <ui-icon type="x" size="18" color="#FC8950"></ui-icon>
+              </ui-col>
+          </ui-row>
+          <view class="title">微信授权页面</view>
+          <view class="profile">授权并同意使用微信账号登录当前小程序</view>
+          <button class="button" type="primary" open-type="getUserInfo" bindgetuserinfo="bindgetuserinfo">授权登录</button>
+      </view>
+    </ui-popup>
+  </view>
+</template>
+
+<script>
+import request from '../../static/utils/request'
+const tagStyle6 = `
+  border: 1px solid #f1f2f3;
+  border-radius: 3px;
+  text-align: center;
+  height: 25px;
+  line-height: 24px;`
+const selectStyle2 = `
+  background: #972323;
+  color: #fff;
+  padding: 0 5px;
+  text-align: center;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 20px;
+  border-radius: 3px;
+`
+export default {
+  config: {
+    navigationBarTitleText: '欢迎自助点餐',
+    backgroundColor: '#F4F4F4',
+    navigationBarTextStyle: 'black',
+    disableScroll: true
+  },
+  data : {
+    current: 0,
+    tabStyle:{
+      'color':'#333',
+      'width:':'80px'
+    },
+    activeTabStyle:{
+      'color': '#ff2a00',
+      'border-right':'1px solid #ff2a00'
+    },
+    tabItems: [{id:0, name: '全部'}],
+    height: wx.DEFAULT_CONTENT_HEIGHT - wx.rpxWidth * 100,
+    tabContentData: [],
+
+    popupShow: false,
+    goodsDetail: {},
+    goodsPrice: 0.00,
+    canbuy: false,
+
+    goodsCarList: [],
+    totleOrderMoney: 0.00,
+    canCreateOrder: false,
+    creating: false,
+
+    popupShowCar: false,
+
+    popupShowLogin: false
+  },
+  fetchGoodsList (categoryId) {
+    const _this = this
+    request({
+      url: '/shop/goods/list',
+      method: 'post',
+      data: {
+        categoryId: categoryId
+      }
+    }).then(res => {
+      if (res.code == 0) {
+        let _tabContentData = []
+        res.data.forEach(element => {
+          _tabContentData.push(element)
+        });
+        _this.setData({
+          tabContentData: _tabContentData
+        })
+      } else {
+        this.setData({
+          tabContentData:[
+            {
+              name: '暂无商品',
+              pic: 'https://cdn.it120.cc/apifactory/2019/01/15/efe19e3b852c0912e4b834f426363f29.png'
+            }
+          ]
+        })
+      }
+    })
+  },
+  fetchGoodsDetail: function (e) {
+    const _this = this
+    const id = e.currentTarget.dataset.id
+    request({
+      url: '/shop/goods/detail',
+      method: 'get',
+      data: {
+        id: id
+      }
+    }).then(res => {      
+      if (res.code == 0) {
+        let canbuy = true
+        if (res.data.properties) {
+          canbuy = false
+          res.data.properties.forEach(property => {
+            property.childsCurGoods.forEach(child => {
+              child.text = child.name
+              child.tagStyle = tagStyle6
+              child.tagSelectedStyle = selectStyle2
+              child.checked = false
+            })
+          })
+        }
+        _this.setData({
+          goodsDetail: res.data,
+          goodsPrice: res.data.basicInfo.minPrice,
+          popupShow: true,
+          canbuy: canbuy
+        })
+      } else {
+        wx.showToast({ icon: 'none', title: res.msg, duration: 2000 })
+      }
+    })
+  },
+  categoryChange (e) { // 点击分类 
+    const _this = this
+    let index = e.detail.index
+    _this.setData({
+      current:index
+    })
+    let categoryId = ''
+    if (index > 0) {
+      categoryId = _this.data.tabItems[index].id
+    }    
+    _this.fetchGoodsList(categoryId)
+  },
+  closePop: function () {
+    this.setData({
+      popupShow: false
+    })
+  },
+  closePopLogin: function () {
+    this.setData({
+      popupShowLogin: false
+    })
+  },
+  selectedProperty (e) { // 点击规格尺寸
+    const _this = this
+    const pindex = e.currentTarget.dataset.pindex
+    const cIndex = e.detail.index
+    // 设置选中状态
+    _this.data.goodsDetail.properties[pindex].childsCurGoods.forEach(child => {
+      child.checked = false
+    })
+    _this.data.goodsDetail.properties[pindex].childsCurGoods[cIndex].checked = !_this.data.goodsDetail.properties[pindex].childsCurGoods[cIndex].checked    
+    _this.setData({
+      canbuy: false,
+      goodsDetail:_this.data.goodsDetail
+    })
+    // 读取新的库存和价格
+    let propertyChildIds = ''
+    _this.data.goodsDetail.properties.forEach(property => {
+      property.childsCurGoods.forEach(child => {
+        if (child.checked) {
+          propertyChildIds = propertyChildIds + ',' + property.id + ':' + child.id
+        }
+      })
+    })
+    request({
+      url: '/shop/goods/price',
+      method: 'post',
+      data: {
+        goodsId:  _this.data.goodsDetail.basicInfo.id,
+        propertyChildIds:propertyChildIds
+      }
+    }).then(res => {
+      if (res.code == 405) {
+        return
+      }
+      if (res.code == 0) {
+        _this.setData({
+          canbuy: true,
+          goodsPrice: res.data.price
+        })
+      } else {
+        wx.showToast({ icon: 'none', title: res.msg, duration: 2000 })
+      }
+    })    
+  },
+  addGoodsCar: function () { // 增加到购物车
+    const _this = this
+    let propertyChildIds = ''
+    let propertyChildNames = ''
+    if (_this.data.goodsDetail.properties) {
+      _this.data.goodsDetail.properties.forEach(property => {
+        property.childsCurGoods.forEach(child => {
+          if (child.checked) {
+            propertyChildIds = propertyChildIds + ',' + property.id + ':' + child.id
+            propertyChildNames = propertyChildNames + ' ' + child.name
+          }
+        })
+      })
+    }    
+    let existEntity = _this.data.goodsCarList.find(ele => {
+      return ele.goodsId == _this.data.goodsDetail.basicInfo.id && ele.propertyChildIds == propertyChildIds
+    })
+    const addMoney = _this.data.goodsPrice
+    if (existEntity) {
+      existEntity.number ++
+      existEntity.priceTotal = existEntity.priceTotal + addMoney
+    } else {
+      let goodsEntity = {}
+      goodsEntity.goodsId = _this.data.goodsDetail.basicInfo.id
+      goodsEntity.goodsName = _this.data.goodsDetail.basicInfo.name
+      goodsEntity.pic = _this.data.goodsDetail.basicInfo.pic
+      goodsEntity.number = 1
+      goodsEntity.propertyChildIds = propertyChildIds
+      goodsEntity.propertyChildNames = propertyChildNames
+      goodsEntity.priceSingle = _this.data.goodsPrice
+      goodsEntity.priceTotal = _this.data.goodsPrice
+
+      _this.data.goodsCarList.push(goodsEntity)
+    }
+    _this.data.totleOrderMoney += addMoney
+    _this.setData({
+      goodsCarList: _this.data.goodsCarList,
+      totleOrderMoney:  _this.data.totleOrderMoney,
+      canCreateOrder: true,
+      popupShow: false
+    })    
+  },
+  toggleCar: function () {    
+    this.setData({
+      popupShowCar: !this.data.popupShowCar
+    })
+  },
+  changegoodscarnumber: function (e) { // 调整购物车的商品数量
+    const _this = this
+    const val = e.detail.toString()
+    const index = e.currentTarget.dataset.index
+    if (parseInt(val) <= 0) {
+      _this.data.goodsCarList.splice(index, 1)
+    } else {
+      _this.data.goodsCarList[index].number = parseInt(val)      
+    }
+    // 计算总价
+    let totleOrderMoney = 0
+    _this.data.goodsCarList.forEach(element => {
+      element.priceTotal = element.priceSingle * element.number
+      totleOrderMoney += element.priceTotal
+    });
+    _this.setData({
+      goodsCarList: _this.data.goodsCarList,
+      totleOrderMoney: totleOrderMoney,
+      canCreateOrder: _this.data.goodsCarList.length > 0
+    })
+  },
+  createOrder: function () { // 创建订单，控制打印机输出打印
+    const _this = this
+    const userInfo = wx.getStorageSync('userInfo')
+    if (!userInfo) {
+      console.log('请先登录')
+      _this.setData({
+        popupShowLogin: true
+      })
+      return
+    }
+    let goodsJsonStr = []
+    _this.data.goodsCarList.forEach(element => {
+      let _json = {}
+      _json.goodsId = element.goodsId
+      _json.number = element.number
+      _json.propertyChildIds = element.propertyChildIds
+      _json.logisticsType = 0
+      goodsJsonStr.push(_json)
+    })    
+    request({
+      url: '/order/create',
+      method: 'post',
+      data: {
+        token: userInfo.token,
+        goodsJsonStr: JSON.stringify(goodsJsonStr)
+      }
+    }).then(res => {
+      if (res.code == 0) {
+        wx.showAlert({
+          content:'无法自动打印订单，请检查您的打印机是否连接！',
+          confirmText:'下单成功',
+          success:(res) =>{
+              console.log(res)
+          }
+        })
+        _this.setData({
+          goodsCarList: [],
+          totleOrderMoney:  0.00,
+          canCreateOrder: false
+        })
+      }
+    })
+  },
+  bindgetuserinfo (e) {
+    console.log(e)
+    this.login(e.detail.iv, e.detail.encryptedData)
+  },
+  onLoad: function() {
+    const _this = this
+    request({
+      url: '/shop/goods/category/all',
+      method: 'get'
+    }).then(res => {
+      if (res.code == 0) {
+        let _tabItems = [{id:0, name: '全部'}]
+        res.data.forEach(element => {
+          _tabItems.push(element)
+        });
+        _this.setData({
+          tabItems: _tabItems
+        })
+      }
+    })
+    
+  },  
+  onReady:function(){
+    this.fetchGoodsList('')
+  },
+  login: function (iv, encryptedData) {
+    let _this = this
+    wx.login({
+      success: function (res) {
+        wx.showLoading({
+          title: ''
+        })
+        request({
+          url: '/user/wxapp/login',
+          method: 'get',
+          data: {
+            code: res.code
+          }
+        }).then(res => {
+          if (res.code === 10000) {
+            // 去注册
+            _this.registerUser(iv, encryptedData)
+            return
+          }
+          if (res.code !== 0) {
+            // 登录错误
+            wx.hideLoading()
+            wx.showModal({
+              title: '提示',
+              content: '无法登录，请重试',
+              showCancel: false
+            })
+            return
+          }
+          let userInfo = {}
+          userInfo.token = res.data.token
+          userInfo.uid = res.data.uid
+          wx.setStorageSync('userInfo', userInfo)
+          _this.closePopLogin()
+        })
+      }
+    })
+  },
+  registerUser: function (iv, encryptedData) {
+    let _this = this
+    wx.login({
+      success: function (res) {
+        let code = res.code
+        let _data = {
+          code: code,
+          encryptedData: encryptedData,
+          iv: iv
+        }
+        const referrer = wx.getStorageSync('referrer')
+        if (referrer) {
+          _data.referrer = referrer
+        }
+        request({
+          url: '/user/wxapp/register/complex',
+          method: 'post',
+          data: _data
+        }).then(res => {
+          console.log(111133)
+          _this.login(iv, encryptedData)
+        })
+      }
+    })
+  }
+}
+</script>
+
+<style lang="less">
+.container {
+  display: flex;
+}
+
+.imgbox{
+  width:64px;
+  height:64px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin:0 auto;
+  // .mix-1px(1, 1, 1, 1, #ccc);
+  border:1px solid #ccc;
+  border-style:rgba(231, 231, 231, 0.6);
+  .ui-image{
+    width:100%
+  }
+}
+
+.small-title{
+  font-size: 24rpx;
+  text-align:center;
+  margin-top:20rpx;
+}
+.goodsPrice{
+  font-size: 24rpx;
+  text-align:center;
+  color:#972323;
+}
+.goods-box{
+  display: flex;
+  flex-wrap:wrap;
+  align-content: flex-start;
+  .goods-list{
+    flex:0 0 33.33%;
+    margin-top:40rpx;
+  }
+}
+
+.bottomDom {
+  height:100rpx;
+  line-height: 100rpx;
+  .mix-1px(0, 0, 1, 0, #972323);
+}
+.gouwuche {
+  display: flex;
+}
+.gouwucheImg {
+  width:60rpx;
+  height:60rpx;
+  margin-left: 30rpx;
+  margin-top: 20rpx;
+}
+.gouwucheMoney{
+  margin-left:30rpx;
+  font-weight:bold;
+}
+
+.popupView{
+  width: 95%;
+  background-color:#fff;
+  margin:0 auto;
+  border-radius:5px;
+  padding-left:20rpx;
+  padding-right:20rpx;
+  overflow:hidden;
+  .popTitle{
+    line-height: 30px;
+    margin-top: 10rpx;
+    margin-bottom: 10rpx;
+    color: #666;
+  }
+}
+.empty-car {
+  text-align: center;
+  margin-top:30rpx;
+  margin-bottom:30rpx;
+  color:#999;  
+}
+.empty-car-img {
+  text-align: center;
+  width:250rpx;
+  height:250rpx;
+  margin-left:200rpx;
+}
+
+// 授权弹框样式
+.title {
+  margin-top:70rpx;
+}
+.profile {
+  margin-top:30rpx;
+  font-size: 14px;
+  color:#888;
+}
+.button {
+  margin-top: 50rpx;
+  margin-bottom: 50rpx;
+}
+</style>
