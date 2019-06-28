@@ -15,6 +15,13 @@
 
 [开发环境安装](http://www.wetouch.net/touchwx_doc/quickstart/begin/ide)
 
+## 其他开源模板
+
+| 舔果果小铺 | 面馆风格小程序 | AI名片 |
+| :------: | :------: | :------: |
+| <img src="https://cdn.it120.cc/apifactory/2018/04/01/b7b8f5a0fcfc72454ade8510ab929717.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2019/03/29/9e30cfe31eabcd218eb9c434f17e9295.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2018/12/18/c2324da4eea91602f385db5b523b13ca.jpg" width="200px"> | 
+| [开源地址](https://github.com/qindiandadudu/TianguoguoXiaopu) | [开源地址](https://gitee.com/javazj/noodle_shop_procedures) | [开源地址](https://github.com/gooking/visitingCard) |
+
 ## 效果截图
 <img src="screenshot/1.png" width="400px"/>
 <img src="screenshot/2.png" width="400px"/>
