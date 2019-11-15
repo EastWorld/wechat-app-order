@@ -17,10 +17,16 @@
 
 ## 其他开源模板
 
-| 舔果果小铺 | 面馆风格小程序 | AI名片 |
-| :------: | :------: | :------: |
-| <img src="https://cdn.it120.cc/apifactory/2018/04/01/b7b8f5a0fcfc72454ade8510ab929717.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2019/03/29/9e30cfe31eabcd218eb9c434f17e9295.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2018/12/18/c2324da4eea91602f385db5b523b13ca.jpg" width="200px"> | 
-| [开源地址](https://github.com/qindiandadudu/TianguoguoXiaopu) | [开源地址](https://gitee.com/javazj/noodle_shop_procedures) | [开源地址](https://github.com/gooking/visitingCard) |
+| 天使童装 | 舔果果小铺 | 面馆风格小程序 | AI名片 |
+| :------: | :------: | :------: | :------: |
+| <img src="https://www.it120.cc/images/tz.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2018/04/01/b7b8f5a0fcfc72454ade8510ab929717.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2019/03/29/9e30cfe31eabcd218eb9c434f17e9295.jpg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2018/12/18/c2324da4eea91602f385db5b523b13ca.jpg" width="200px"> | 
+| [开源地址](https://github.com/EastWorld/wechat-app-mall) | [开源地址](https://github.com/walcer/TianguoguoXiaopu) | [开源地址](https://gitee.com/javazj/noodle_shop_procedures) | [开源地址](https://github.com/gooking/visitingCard) |
+
+## 联系作者
+
+| 微信好友 | 支付宝好友 |
+| :------: | :------: |
+| <img src="https://cdn.it120.cc/apifactory/2019/07/03/a86f7e46-1dbc-42fe-9495-65403659671e.jpeg" width="200px"> | <img src="https://cdn.it120.cc/apifactory/2019/07/03/fda59aeb-4943-4379-93bb-92856740bd6a.jpeg" width="200px"> |
 
 ## 效果截图
 <img src="screenshot/1.png" width="400px"/>
@@ -33,9 +39,22 @@
 
 ## 使用教程
 1. 修改 config.js 文件， subDomain 改为你自己的域名
-    > 你可以 [免费开通后台账号](https://www.it120.cc/)
-2. 登录你的[小程序后台](https://mp.weixin.qq.com)，[设置小程序合法服务器域名](https://www.it120.cc/info/faq/10469)，修改后需要重启小程序开发工具才能生效
-3. [登录后台](https://www.it120.cc/user)，左侧菜单，微信设置填写您的小程序 appid 和 secret
+    
+    [《免费开通后台账号》](https://admin.it120.cc/)
+
+    [《什么是专属域名？》](https://www.yuque.com/apifm/doc/qr6l4m)
+2. 登录你的[小程序后台](https://mp.weixin.qq.com)，[设置小程序合法服务器域名](https://www.yuque.com/apifm/doc/tvpou9)，修改后需要重启小程序开发工具才能生效
+3. [登录后台](https://admin.it120.cc/)，左侧菜单，微信设置填写您的小程序 appid 和 secret
+
+## 初始化测试数据
+
+    登录后台，左侧菜单 “工厂设置” --> “数据克隆” --> “将别人的数据克隆给我”
+
+    对方商户ID填写  51
+
+    点击 “立即克隆” ，然后退出后台重新登录
+
+    你将立即享有初始化测试数据，方便你进行测试
 
 ## 运行小程序
 1. npm install
