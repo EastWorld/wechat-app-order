@@ -10,6 +10,10 @@
 
 >更加欢迎会开发的您一起加入，完善本项目
 
+## 推荐一个极好的餐饮点餐项目
+
+[https://github.com/woniudiancang/bee](https://github.com/woniudiancang/bee)
+
 ## 开发框架
 基于[Touch WX](http://www.wetouch.net/touchwx_doc/quickstart/)框架，可以点击查看
 
